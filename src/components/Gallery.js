@@ -180,13 +180,13 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
         />
 
         {activeSection === 'Leaderboard' && (
-          <Section title="Leaderboard">
+          <Section title="">
             <p className="text-white">Leaderboard content goes here.</p>
           </Section>
         )}
 
         {activeSection === 'Gallery' && (
-          <Section title="Gallery">
+          <Section title="">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {images.slice(0, visibleImages).map(image => (
                 <ImageCard 
@@ -211,7 +211,7 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
         )}
 
         {activeSection === 'My Submission' && (
-          <Section title="My Submission">
+          <Section title="">
             <p className="text-white">Your submission form or content goes here.</p>
           </Section>
         )}
