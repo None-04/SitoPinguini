@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronUp } from 'lucide-react';
+import { ChevronUp, Search, UserPlus } from 'lucide-react';
 
 // Function to fetch images (simulation)
 const fetchImages = (count) => {
@@ -14,7 +14,7 @@ const fetchImages = (count) => {
 };
 
 // Image Card Component
-const ImageCard = ({ image, onVote, isSelected }) => {
+const ImageCard = ({ image, onVote }) => {
   const [aspectRatio, setAspectRatio] = useState(4 / 3);
 
   useEffect(() => {
@@ -27,15 +27,15 @@ const ImageCard = ({ image, onVote, isSelected }) => {
 
   return (
     <div className="relative group">
-      <div 
-        className={`relative overflow-hidden rounded-lg w-full shadow-[0_6px_20px_rgba(50,50,50,0.8)] ${isSelected ? 'border border-black' : ''}`} // Adjusted shadow to darker gray
+      <div
+        className={`relative overflow-hidden rounded-lg w-full shadow-[0_6px_20px_rgba(50,50,50,0.8)]`}
         style={{ paddingBottom: `${(1 / aspectRatio) * 100}%` }}
       >
-        <img 
-          src={image.imageUrl} 
-          alt={image.title} 
-          className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-          loading="lazy" 
+        <img
+          src={image.imageUrl}
+          alt={image.title}
+          className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
         />
         <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-80 transition-opacity duration-300"></div>
         <div className="absolute inset-0 p-2 flex flex-col justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -66,10 +66,9 @@ const ImageCard = ({ image, onVote, isSelected }) => {
   );
 };
 
-// Navigation Component with Clickable Words and Underline
+// Navigation Component
 const Navigation = ({ activeSection, setActiveSection, sections }) => {
   const wordRefs = useRef([]);
-  wordRefs.current = [];
 
   const addToRefs = (el) => {
     if (el && !wordRefs.current.includes(el)) {
@@ -80,7 +79,7 @@ const Navigation = ({ activeSection, setActiveSection, sections }) => {
   return (
     <div className="relative mb-8 w-full max-w-xl mx-auto">
       <div className="relative flex justify-between">
-        {sections.map((section, index) => (
+        {sections.map((section) => (
           <span
             key={section}
             ref={addToRefs}
@@ -98,7 +97,7 @@ const Navigation = ({ activeSection, setActiveSection, sections }) => {
   );
 };
 
-// Underline Component (Black Line + Yellow Underline)
+// Underline Component
 const Underline = ({ activeSection, sections, wordRefs }) => {
   const activeIndex = sections.indexOf(activeSection);
   const [lineWidth, setLineWidth] = useState(0);
@@ -120,15 +119,15 @@ const Underline = ({ activeSection, sections, wordRefs }) => {
         style={{
           width: lineWidth,
           left: lineLeft,
-          top: '50%', // Align vertically to the middle
-          transform: 'translateY(-50%)', // Center vertically
+          top: '50%',
+          transform: 'translateY(-50%)',
         }}
       />
     </div>
   );
 };
 
-// Section Component for Title and Children
+// Section Component
 const Section = ({ title, children }) => (
   <div className="mb-8">
     <h2 className="text-xl sm:text-2xl font-bold mb-4 text-white">{title}</h2>
@@ -136,11 +135,50 @@ const Section = ({ title, children }) => (
   </div>
 );
 
+// Filter Dropdown Component
+const FilterDropdown = ({ onValueChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState("Filter");
+
+  const handleSelection = (value) => {
+    setSelectedValue(value);
+    onValueChange(value);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-[180px] bg-white bg-opacity-20 text-white border border-transparent focus:ring-2 focus:ring-[rgb(230,164,14)] rounded-lg flex items-center justify-between px-4 py-2"
+      >
+        {selectedValue}
+        <span className="ml-2">{isOpen ? '▲' : '▼'}</span>
+      </button>
+      {isOpen && (
+        <div className="absolute z-10 bg-white bg-opacity-80 rounded-lg shadow-lg mt-1 w-full">
+          {['All', 'Recent', 'Popular', 'Trending'].map((filter) => (
+            <div
+              key={filter}
+              onClick={() => handleSelection(filter.toLowerCase())}
+              className="cursor-pointer hover:bg-[rgb(230,164,14)] hover:text-white p-2"
+            >
+              {filter}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Main Gallery Component
 const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
   const [images, setImages] = useState([]);
   const [visibleImages, setVisibleImages] = useState(20);
   const [activeSection, setActiveSection] = useState('Leaderboard');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     setImages(fetchImages(500));
@@ -152,6 +190,16 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
 
   const loadMore = () => {
     setVisibleImages(prev => Math.min(prev + 20, images.length));
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    console.log('Searching for:', searchQuery);
+  };
+
+  const handleFilterChange = (value) => {
+    setFilter(value);
+    console.log('Filtering by:', value);
   };
 
   const backgroundStyle = backgroundImage
@@ -171,13 +219,40 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
   return (
     <div className="min-h-screen overflow-auto" style={backgroundStyle}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <h1 className="text-4xl font-bold my-8 text-center text-white">Stage 2</h1>
-        
+        <div className="flex justify-between items-center my-8">
+          <h1 className="text-4xl font-bold text-white">Stage 2</h1>
+          <button className="bg-[rgb(230,164,14)] hover:bg-[rgb(194,134,0)] text-white font-bold py-2 px-4 rounded-lg flex items-center">
+            <UserPlus size={20} className="mr-2" />
+            Connect
+          </button>
+        </div>
+
         <Navigation 
           activeSection={activeSection} 
           setActiveSection={setActiveSection} 
           sections={['Leaderboard', 'Gallery', 'My Submission']} 
         />
+
+        <div className="mb-8 flex items-center justify-center space-x-4">
+          <form onSubmit={handleSearch} className="flex-grow max-w-2xl">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[rgb(230,164,14)]"
+              />
+              <button
+                type="submit"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white"
+              >
+                <Search size={20} />
+              </button>
+            </div>
+          </form>
+          <FilterDropdown onValueChange={handleFilterChange} />
+        </div>
 
         {activeSection === 'Leaderboard' && (
           <Section title="">
@@ -193,7 +268,6 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
                   key={image.id} 
                   image={image} 
                   onVote={handleVote} 
-                  isSelected={false} // Change this to dynamically set based on user selection if needed
                 />
               ))}
             </div>
@@ -219,15 +293,15 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
       <style jsx global>{`
         /* Custom Scrollbar Styles */
         ::-webkit-scrollbar {
-          width: 8px; /* Thinner scrollbar */
-          height: 8px; /* Thinner horizontal scrollbar */
+          width: 8px;
+          height: 8px;
         }
         ::-webkit-scrollbar-thumb {
-          background: rgba(0, 0, 0, 0.5); /* Dark gray scrollbar */
-          border-radius: 10px; /* Rounded edges */
+          background: rgba(0, 0, 0, 0.5);
+          border-radius: 10px;
         }
         ::-webkit-scrollbar-track {
-          background: transparent; /* Transparent background for track */
+          background: transparent;
         }
       `}</style>
     </div>
