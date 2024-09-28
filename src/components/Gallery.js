@@ -218,41 +218,47 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
 
   return (
     <div className="min-h-screen overflow-auto" style={backgroundStyle}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex justify-between items-center my-8">
-          <h1 className="text-4xl font-bold text-white">Stage 2</h1>
-          <button className="bg-[rgb(230,164,14)] hover:bg-[rgb(194,134,0)] text-white font-bold py-2 px-4 rounded-lg flex items-center">
-            <UserPlus size={20} className="mr-2" />
-            Connect
-          </button>
+          <div className="flex-grow text-center">
+            <h1 className="text-4xl font-bold text-white">Stage 2</h1>
+          </div>
+          <div className="flex-none">
+            <button className="bg-[rgb(230,164,14)] hover:bg-[rgb(194,134,0)] text-white font-bold py-2 px-4 rounded-lg flex items-center">
+              <UserPlus size={20} className="mr-2" />
+              Connect
+            </button>
+          </div>
         </div>
-
+        
         <Navigation 
           activeSection={activeSection} 
           setActiveSection={setActiveSection} 
           sections={['Leaderboard', 'Gallery', 'My Submission']} 
         />
 
-        <div className="mb-8 flex items-center justify-center space-x-4">
-          <form onSubmit={handleSearch} className="flex-grow max-w-2xl">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[rgb(230,164,14)]"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white"
-              >
-                <Search size={20} />
-              </button>
-            </div>
-          </form>
-          <FilterDropdown onValueChange={handleFilterChange} />
-        </div>
+        {activeSection === 'Gallery' && (
+          <div className="mb-8 flex items-center justify-center space-x-4">
+            <form onSubmit={handleSearch} className="flex-grow max-w-2xl">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[rgb(230,164,14)]"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-white"
+                >
+                  <Search size={20} />
+                </button>
+              </div>
+            </form>
+            <FilterDropdown onValueChange={handleFilterChange} />
+          </div>
+        )}
 
         {activeSection === 'Leaderboard' && (
           <Section title="">
@@ -262,7 +268,7 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
 
         {activeSection === 'Gallery' && (
           <Section title="">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 w-5/6 mx-auto">
               {images.slice(0, visibleImages).map(image => (
                 <ImageCard 
                   key={image.id} 
