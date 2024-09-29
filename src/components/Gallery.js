@@ -292,7 +292,6 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
 
-  
   useEffect(() => {
     setImages(fetchImages(500));
   }, []);
@@ -329,33 +328,38 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
       }
     : {};
 
-  return (
-    <div className="min-h-screen overflow-auto" style={backgroundStyle} onScroll={(p)=>{
-      const { scrollTop, clientHeight, scrollHeight } = p.target;
-      if(activeSection === 'Gallery'){
-        if (scrollTop + clientHeight >= scrollHeight) {
-          loadMore();
-        }
-      }
-    }}>
-      <div className="px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex justify-between items-center my-8">
-          <div className="flex-grow text-center">
-            <h1 className="text-4xl font-bold text-white">Stage 2</h1>
+    return (
+      <div 
+        className="min-h-screen overflow-auto" 
+        style={backgroundStyle} 
+        onScroll={(p) => {
+          const { scrollTop, clientHeight, scrollHeight } = p.target;
+          if(activeSection === 'Gallery'){
+            if (scrollTop + clientHeight >= scrollHeight) {
+              loadMore();
+            }
+          }
+        }}
+      >
+        <div className="px-4 sm:px-6 lg:px-8 relative z-10 safe-area-padding">
+          <div className="flex justify-between items-center my-8">
+            <div className="flex-grow text-center">
+              <h1 className="text-4xl font-bold text-white">Stage 2</h1>
+            </div>
+            <div className="flex-none">
+              <button className="bg-[rgb(230,164,14)] hover:bg-[rgb(194,134,0)] text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                <UserPlus size={20} className="mr-2" />
+                Connect
+              </button>
+            </div>
           </div>
-          <div className="flex-none">
-            <button className="bg-[rgb(230,164,14)] hover:bg-[rgb(194,134,0)] text-white font-bold py-2 px-4 rounded-lg flex items-center">
-              <UserPlus size={20} className="mr-2" />
-              Connect
-            </button>
-          </div>
-        </div>
-        
-        <Navigation 
-          activeSection={activeSection} 
-          setActiveSection={setActiveSection} 
-          sections={['Leaderboard', 'Gallery', 'My Submission']} 
-        />
+          
+          <Navigation 
+            activeSection={activeSection} 
+            setActiveSection={setActiveSection} 
+            sections={['Leaderboard', 'Gallery', 'My Submission']} 
+          />
+  
 
         {activeSection === 'Gallery' && (
           <div className="mb-8 flex items-center justify-center space-x-4">
@@ -415,7 +419,7 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
             <p className="text-white">Your submission form or content goes here.</p>
           </Section>
         )}
-</div>
+      </div>
       <style jsx global>{`
         /* Custom Scrollbar Styles */
         ::-webkit-scrollbar {
@@ -428,6 +432,32 @@ const Gallery = ({ backgroundImage = 'SitoPinguini.png' }) => {
         }
         ::-webkit-scrollbar-track {
           background: transparent;
+        }
+
+        /* Safe area padding for notched devices */
+        @supports (padding-top: env(safe-area-inset-top)) {
+          .safe-area-padding {
+            padding-top: env(safe-area-inset-top);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+          }
+        }
+
+        /* Fallback for devices without notch */
+        .safe-area-padding {
+          padding-top: max(16px, env(safe-area-inset-top));
+          padding-right: max(16px, env(safe-area-inset-right));
+          padding-bottom: max(16px, env(safe-area-inset-bottom));
+          padding-left: max(16px, env(safe-area-inset-left));
+        }
+
+        /* Ensure the content is not hidden behind the notch on landscape orientation */
+        @media screen and (orientation: landscape) {
+          .safe-area-padding {
+            padding-left: max(32px, env(safe-area-inset-left));
+            padding-right: max(32px, env(safe-area-inset-right));
+          }
         }
       `}</style>
     </div>
